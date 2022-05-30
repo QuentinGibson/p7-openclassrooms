@@ -10,7 +10,7 @@ describe("GET /api/job", () => {
         if (err) throw err;
         assert(res.body.hasownproperty("message"));
         assert(res.body.hasownproperty("jobs"));
-        done
+        done;
       });
   });
   describe("GET /api/job/:department_id", () => {
@@ -21,7 +21,7 @@ describe("GET /api/job", () => {
           if (err) throw err;
           assert(res.body.hasownproperty("message"));
           assert(res.body.hasownproperty("jobs"));
-          done
+          done;
         });
     });
   });
@@ -33,9 +33,9 @@ describe("GET /api/job", () => {
           if (err) throw err;
           assert(res.body.hasownproperty("message"));
           assert(res.body.hasownproperty("job"));
-          done
-        })
-    })
+          done;
+        });
+    });
   });
 });
 
@@ -43,27 +43,27 @@ describe("POST /api/job/:department_id", () => {
   it("should be able to create a job for department by department_id", (done) => {
     request(app)
       .post("/api/job/1")
-      .send({title : "foo"})
+      .send({ title: "foo" })
       .expect(200, (err, res) => {
         if (err) throw err;
         assert(res.body.hasownproperty("message"));
-        done
-      })
+        done;
+      });
   });
-
+});
 
 describe("PUT /api/job/:job_id", () => {
   it("should be able to update a job by its id", (done) => {
     request(app)
       .put("/api/job/1")
-      .send({title: "bar"})
+      .send({ title: "bar" })
       .expect(200, (err, res) => {
         if (err) throw err;
         assert(res.body.hasownproperty("message"));
-        done
-      })
+        done;
+      });
   });
-})
+});
 
 describe("DELETE /api/department", () => {
   it("should be able to delete a department by id", (done) => {
@@ -72,7 +72,7 @@ describe("DELETE /api/department", () => {
       .expect(200, (err, res) => {
         if (err) throw err;
         assert(res.body.hasownproperty("message"));
-        done
+        done;
       });
   });
 });
