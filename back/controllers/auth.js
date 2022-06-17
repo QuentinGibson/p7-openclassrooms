@@ -30,9 +30,9 @@ module.exports = {
       });
     } else {
       const storedHash = user.getDataValue("password");
-      await bcrypt.compare(pass, storedHash).then((match) => {
+      await bcrypt.compare(pass, storedHash).then(async (match) => {
         if (match) {
-          const user_id = await user.getDataValue("user_id")
+          const user_id = await user.getDataValue("user_id");
           const token = jwt.sign({ user_id }, process.env.TOKEN_SECRET);
           res.status(200).json({
             message: "Sign in Successfull",
