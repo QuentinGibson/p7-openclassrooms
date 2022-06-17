@@ -1,7 +1,7 @@
 const User = require("../models/User");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const dotenv = require("dotenv")
+const dotenv = require("dotenv");
 dotenv.config()
 
 module.exports = {
@@ -17,6 +17,12 @@ module.exports = {
     const passwordHash = await bcrypt.hash(password, 13);
     const decodedToken = jwt.verify(token, process.env.TOKEN_SECRECT)
     const {user_id} = decodedToken
-    await User.update({ email, passwordHash},{where: {user_id}})
+    await User.update({ email, passwordHash},{where: {user_id}}).then(res.ststus(200).json({message: "User successfully updated!"}))
+  },
+  getUser: async (res, req, next) => {
+    const user_id = req.params.id
+    const user = await User.findOne({where: {user_id}})
+    res.status(200).json({ message: "User found!", user: user.toJSON() })
+
   }
 };
