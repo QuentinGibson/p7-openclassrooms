@@ -7,10 +7,8 @@ describe("GET /api/auth", () => {
     request(app)
       .get("/api/auth/signup")
       .send({
-        firstname: "foo",
-        lastname: "bar",
         email: "personal@email.com",
-        pass: "secrectcode",
+        password: "secrectcode",
       })
       .expect(200, (err, res) => {
         if (err) throw err;
@@ -21,11 +19,10 @@ describe("GET /api/auth", () => {
   it("should be able to log a user in", (done) => {
     request(app)
       .get("/api/auth/login")
-      .send({ email: "personal@email.com", pass: "secretcode" })
+      .send({ email: "personal@email.com", password: "secretcode" })
       .expect(200, (err, res) => {
         if (err) throw err;
         assert(res.body.hasownproperty("message"));
-        assert(res.body.hasownproperty("user_id"));
         assert(res.body.hasownproperty("token"));
         done;
       });
