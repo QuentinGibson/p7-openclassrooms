@@ -4,21 +4,32 @@ const User = require("../models/User");
 require("dotenv").config();
 module.exports = {
   signUp: async (req, res, next) => {
-    const { email, pass } = req.body;
-    const hash = await bcrypt.hash(pass, 13);
-    const [user, created] = await User.findOrCreate({
-      where: { email },
-      defaults: { password: hash },
-    });
-    if (user) {
-      res.status(500).json({
-        message: "An account with this email already exists",
+    const { email, password } = req.body;
+    await bcrypt
+      .hash(password, 13)
+      .then(async (hash) => {
+        return await User.findOrCreate({
+          where: { email },
+          defaults: { password: hash },
+        });
+      })
+      .then(([user, created]) => {
+        if (user) {
+          res.status(500).json({
+            message: "An account with this email already exists",
+          });
+        } else if (created) {
+          res.status(202).json({
+            message: "User successfully created",
+          });
+        }
+      })
+      .catch((error) => {
+        res.status(500).json({
+          message: "Error when saving user",
+          error,
+        });
       });
-    } else if (created) {
-      res.status(202).json({
-        message: "User successfully created",
-      });
-    }
   },
   signIn: async (req, res, next) => {
     const { email, pass } = req.body;
