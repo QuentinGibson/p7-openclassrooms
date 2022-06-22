@@ -1,7 +1,7 @@
 const { RateLimiterMemory } = require("rate-limiter-flexible");
 
 const opts = {
-  points: 6, // 6 points
+  points: 10,
   duration: 1, // Per second
 };
 
@@ -13,9 +13,6 @@ module.exports = (req, res, next) => {
   rateLimiter
     .consume(ipAddress, 2) // consume 2 points
     .then((rateLimiterRes) => {
-      console.log(
-        `rate info: ipdress - ${ipAddress}, score - ${rateLimiterRes}`
-      );
       // 2 points consumed
       next();
     })

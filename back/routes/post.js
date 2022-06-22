@@ -1,5 +1,6 @@
 const express = require("express");
 const multer = require("../middleware/multer-config");
+const rateLimiter = require("../middleware/rate-limit");
 const auth = require("../middleware/auth");
 const {
   getRecentPosts,
@@ -11,10 +12,10 @@ const {
 
 const router = express.Router();
 
-router.get("/:id", auth, getPostById);
-router.get("/", auth, getRecentPosts);
-router.post("/", auth, multer, createPost);
-router.put("/:id", auth, multer, updatePost);
-router.delete("/:id", auth, deletePost);
+router.get("/:id", getPostById);
+router.get("/", getRecentPosts);
+router.post("/", auth, multer, rateLimiter, createPost);
+router.put("/:id", auth, multer, rateLimiter, updatePost);
+router.delete("/:id", auth, rateLimiter, deletePost);
 
 module.exports = router;

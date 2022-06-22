@@ -12,7 +12,7 @@ require("dotenv").config();
 
 const app = express();
 app.use(cors());
-app.use(helmet());
+app.use(helmet({ crossOriginResourcePolicy: { policy: "same-site" } }));
 app.use(bodyParser.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);

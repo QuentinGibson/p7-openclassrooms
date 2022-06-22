@@ -6,16 +6,16 @@ module.exports = (req, res, next) => {
   try {
     const token = req.headers["authorization"].split(" ")[1];
     const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET);
-    const userId = decodedToken.userId;
-    if (req.body.userId && req.body.userId !== userId) {
+    const user_id = decodedToken.user_id;
+
+    if (req.body.user_id && req.body.user_id !== user_id) {
       throw "Invalid user ID";
     } else {
       next();
     }
   } catch (error) {
-    console.log("Error when auth: " + error);
     res.status(500).json({
-      error: new Error("Invalid request"),
+      error: "No proper auth found",
     });
   }
 };

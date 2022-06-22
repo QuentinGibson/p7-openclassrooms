@@ -1,17 +1,11 @@
 const Post = require("../models/Post");
 module.exports = {
-  getRecentPosts: async (res, req, next) => {
-    await Post.findAndCountAll({
-      groupedLimit: "20",
-    })
-      .then(([count, group]) => {
-        const posts = group.map((post_group) =>
-          post_group.map((post) => post.toJson())
-        );
+  getRecentPosts: async (req, res, next) => {
+    await Post.findAll({})
+      .then((posts) => {
         res.status(200).json({
           message: "Successfully retrieved posts",
           posts,
-          count,
         });
       })
       .catch((error) => {
@@ -21,7 +15,7 @@ module.exports = {
         });
       });
   },
-  getPostById: async (res, req, next) => {
+  getPostById: async (req, res, next) => {
     const post = await Post.findByPk(req.params.id);
     if (post) {
       res.status(200).json({
@@ -34,10 +28,9 @@ module.exports = {
       });
     }
   },
-  createPost: async (res, req, next) => {
+  createPost: async (req, res, next) => {
     if (req.file) {
       const url = req.protocol + "://" + req.get("host");
-      req.body.post = JSON.parse(req.body.post);
       const { title } = req.body.post;
       const imageUrl = url + "/images/" + req.file.filename;
       const post = await Post.create({ title, image: imageUrl }).catch(
@@ -58,16 +51,8 @@ module.exports = {
       });
     }
   },
-  updatePost: async (res, req, next) => {
-    const token = req.headers.authorization.split(" ")[1];
-    const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET);
-    const { user_id } = decodedToken;
+  updatePost: async (req, res, next) => {
     if (req.file) {
-      if (!user_id !== req.body.post.user_id) {
-        return res.status(400).json({
-          message: "Failed to update post",
-        });
-      }
       req.body.post = JSON.parse(req.body.post);
       const url = req.protocol + "://" + req.get("host");
       const { title } = req.body.post;
@@ -90,11 +75,6 @@ module.exports = {
           });
         });
     } else {
-      if (!user_id !== req.body.user_id) {
-        return res.status(400).json({
-          message: "Failed to update post",
-        });
-      }
       const { title } = req.body;
       const post = await Post.findByPk(req.params.id);
       post.title = title;
@@ -105,20 +85,20 @@ module.exports = {
       });
     }
   },
-  deletePost: async (res, req, next) => {
-    const post = Post.findByPk(req.params.id);
-    await post.destroy().then(() => {
-      res
-        .status(200)
-        .json({
+  deletePost: async (req, res, next) => {
+    const post = await Post.findByPk(req.params.id);
+    await post
+      .destroy()
+      .then(() => {
+        res.status(200).json({
           message: "Successfully deleted post!",
-        })
-        .catch((error) => {
-          res.status(500).json({
-            message: "Failed to delete post!",
-            error,
-          });
         });
-    });
+      })
+      .catch((error) => {
+        res.status(500).json({
+          message: "Failed to delete post!",
+          error,
+        });
+      });
   },
 };

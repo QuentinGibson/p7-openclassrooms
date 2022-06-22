@@ -14,11 +14,11 @@ module.exports = {
         });
       })
       .then(([user, created]) => {
-        if (user) {
+        if (!created) {
           res.status(500).json({
             message: "An account with this email already exists",
           });
-        } else if (created) {
+        } else {
           res.status(202).json({
             message: "User successfully created",
           });
@@ -32,29 +32,39 @@ module.exports = {
       });
   },
   signIn: async (req, res, next) => {
-    const { email, pass } = req.body;
-    const user = await User.findOne({ where: { email } });
-
-    if (!user) {
-      res.status(500).json({
-        message: "Login Invalid",
-      });
-    } else {
-      const storedHash = user.getDataValue("password");
-      await bcrypt.compare(pass, storedHash).then(async (match) => {
-        if (match) {
-          const user_id = await user.getDataValue("user_id");
-          const token = jwt.sign({ user_id }, process.env.TOKEN_SECRET);
-          res.status(200).json({
-            message: "Sign in Successfull",
-            token,
+    const { email, password } = req.body;
+    await User.findOne({ where: { email } }).then(async (user) => {
+      if (!user) {
+        res.status(500).json({
+          message: "Login Invalid",
+        });
+      } else {
+        const storedHash = await user.getDataValue("password");
+        await bcrypt
+          .compare(password, storedHash)
+          .then(async (match) => {
+            if (match) {
+              const user_id = await user.getDataValue("id");
+              const token = jwt.sign({ user_id }, process.env.TOKEN_SECRET, {
+                expiresIn: "24h",
+              });
+              res.status(200).json({
+                message: "Sign in Successful",
+                token,
+              });
+            } else {
+              res.status(500).json({
+                message: "Login Invalid",
+              });
+            }
+          })
+          .catch((error) => {
+            res.status(500).json({
+              message: "Error when logging in",
+              error,
+            });
           });
-        } else {
-          res.status(500).json({
-            message: "Login Invalid",
-          });
-        }
-      });
-    }
+      }
+    });
   },
 };
